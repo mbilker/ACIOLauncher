@@ -255,7 +255,10 @@ const unsigned char * const ACIO::getPacketData(
     unsigned int length
 ) {
 	/* Exit early if we didn't get a good packet */
-	if (length < MINIMUM_PACKET_LENGTH) { return NULL; }
+	if (length < MINIMUM_PACKET_LENGTH) {
+	  DEBUG_PRINTF("Packet below MINIMUM_PACKET_LENGTH!\n");
+	  return NULL;
+	}
 
     for( unsigned int i = 0; i <= length - MINIMUM_PACKET_LENGTH; i++ )
     {
@@ -268,10 +271,12 @@ const unsigned char * const ACIO::getPacketData(
             *command    = (data[COMMAND_HIGH_LOCATION] << 8) | data[COMMAND_LOW_LOCATION];
             *len        = (data[LENGTH_HIGH_LOCATION] << 8) | data[LENGTH_LOW_LOCATION];
             *checksum   = data[(*len) + HEADER_LENGTH];
+            DEBUG_PRINTF("Got data! (readerId: %u (%08x), command: 0x%08x, len: %u, checksum: 0x%08x)\n", *readerId, *readerId, *command, *len, *checksum);
             return data + HEADER_LENGTH;
         }
     }
 
+    DEBUG_PRINTF("No good packet data\n");
     return NULL;
 }
 
@@ -355,10 +360,12 @@ unsigned int ACIO::getReaderCount( HANDLE hSerial )
     unsigned int len;
     unsigned int checksum;
     const unsigned char * const payload = getPacketData( &readerId, &command, &len, &checksum, data, length );
+    DEBUG_PRINTF("payload: %p, len: %d\n", payload, len);
 
     if( payload == NULL ) { return 0; }
     if( len != 1 ) { return 0; }
 
+    DEBUG_PRINTF("Maybe a reader! (payload[0] = %d (0x%08x))\n", payload[0], payload[0]);
     return payload[0];
 }
 
@@ -441,6 +448,8 @@ reader_type_t ACIO::getReaderType( HANDLE hSerial, unsigned int id )
     {
         memcpy( code, &payload[8], 4 );
         code[4] = 0x00;
+
+        DEBUG_PRINTF("Reader Type: %s\n", code);
 
 		if (strcmp(code, "ICCA") == 0) {
 			return TYPE_READER;
