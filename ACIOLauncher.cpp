@@ -18,7 +18,7 @@
  */
 #define CARD_READER_MODE      0
 
-int _tmain(int argc, _TCHAR* argv[])
+int wmain(int argc, _TCHAR *argv[])
 {
     /* Ensure command is good */
     if( argc < 2 )
@@ -145,6 +145,8 @@ int _tmain(int argc, _TCHAR* argv[])
 				case KEY_BLANK:
 					request_reader_toggle = true;
 					break;
+				case KEY_NONE:
+				  break;
 			}
 
 			if (game != 0)

@@ -2,3 +2,6 @@
 *.suo
 *.user
 Debug/
+
+*.o
+ACIOLauncher.exe

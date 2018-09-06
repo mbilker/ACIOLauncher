@@ -148,7 +148,7 @@ launcher_program_t *Menu::LoadSettings( _TCHAR *ini_file, unsigned int *final_le
 	launcher_program_t temp;
 
 	// Open the file
-	HANDLE hFile = CreateFile(ini_file, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+	HANDLE hFile = CreateFileW(ini_file, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	char buffer[16384];
 	unsigned int eof = 0;
 	unsigned int eol = 0;
@@ -197,7 +197,7 @@ launcher_program_t *Menu::LoadSettings( _TCHAR *ini_file, unsigned int *final_le
 				char *game = buffer + 1;
 
 				/* Copy this into temp structure */
-				strcpy_s( temp.name, MAX_GAME_NAME_LENGTH, game );
+				strncpy( temp.name, game, MAX_GAME_NAME_LENGTH );
 				got_name = 1;
 			}
 			else
@@ -205,13 +205,13 @@ launcher_program_t *Menu::LoadSettings( _TCHAR *ini_file, unsigned int *final_le
 				if (strncmp(buffer, "launch", 6) == 0) {
 					unsigned int loc = 6;
 					// Find equals sign after space
-					while (loc < buflen && buffer[loc] == ' ' || buffer[loc] == '\t' ) { loc++; }
+					while ((loc < buflen && buffer[loc] == ' ') || buffer[loc] == '\t' ) { loc++; }
 					if (loc < buflen)
 					{
 						if (buffer[loc] == '=')
 						{
 							loc++;
-							while (loc < buflen && buffer[loc] == ' ' || buffer[loc] == '\t' ) { loc++; }
+							while ((loc < buflen && buffer[loc] == ' ') || buffer[loc] == '\t' ) { loc++; }
 							if (loc < buflen)
 							{
 								char *launch = buffer + loc;
@@ -219,7 +219,7 @@ launcher_program_t *Menu::LoadSettings( _TCHAR *ini_file, unsigned int *final_le
 								if( got_name == 1 )
 								{
 									/* We have a name to associate with this */
-									strcpy_s( temp.location, MAX_GAME_LOCATION_LENGTH, launch );
+									strncpy( temp.location, launch, MAX_GAME_LOCATION_LENGTH );
 									got_name = 0;
 
 									/* Make a new spot for this, copy in */

@@ -40,7 +40,7 @@ ACIO::ACIO()
     {
 		/* Print out reader version in debug mode */
 		const char * const version = getReaderVersion( serial, x );
-		char * typestring;
+		const char * typestring;
 		reader_type_t type = getReaderType( serial, x );
 
 		switch( type ) {
@@ -189,7 +189,7 @@ void ACIO::requestCardEject(int reader)
 
 HANDLE ACIO::openSerial( const _TCHAR *arg, int baud )
 {
-    HANDLE hSerial = CreateFile(arg, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+    HANDLE hSerial = CreateFileW(arg, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
 	if (hSerial == INVALID_HANDLE_VALUE) { return hSerial; }
 
 	int rate;
@@ -364,10 +364,11 @@ unsigned int ACIO::getReaderCount( HANDLE hSerial )
 
 void ACIO::initReader( HANDLE hSerial, unsigned int id, int whichInit )
 {
+    unsigned char new_id = id + 1;
     unsigned int init_length[3] = { 7, 7, 8 };
-    unsigned char init_probe[3][8] = { { 0xAA, (id + 1), 0x00, 0x03, 0x00, 0x00, 0xFF, },
-                                       { 0xAA, (id + 1), 0x01, 0x00, 0x00, 0x00, 0xFF, },
-                                       { 0xAA, (id + 1), 0x01, 0x30, 0x00, 0x01, 0x00, 0xFF, } };
+    unsigned char init_probe[3][8] = { { 0xAA, new_id, 0x00, 0x03, 0x00, 0x00, 0xFF, },
+                                       { 0xAA, new_id, 0x01, 0x00, 0x00, 0x00, 0xFF, },
+                                       { 0xAA, new_id, 0x01, 0x30, 0x00, 0x01, 0x00, 0xFF, } };
     unsigned char data[1024];
     DWORD length;
 
@@ -381,7 +382,8 @@ void ACIO::initReader( HANDLE hSerial, unsigned int id, int whichInit )
 
 const char * const ACIO::getReaderVersion( HANDLE hSerial, unsigned int id )
 {
-    unsigned char version_probe[] = { 0xAA, (id + 1), 0x00, 0x02, 0x00, 0x00, 0xFF, };
+    unsigned char new_id = id + 1;
+    unsigned char version_probe[] = { 0xAA, new_id, 0x00, 0x02, 0x00, 0x00, 0xFF, };
     static char version[33] = { 0x00 };
     unsigned char data[1024];
     DWORD length;
@@ -416,7 +418,8 @@ const char * const ACIO::getReaderVersion( HANDLE hSerial, unsigned int id )
 
 reader_type_t ACIO::getReaderType( HANDLE hSerial, unsigned int id )
 {
-    unsigned char version_probe[] = { 0xAA, (id + 1), 0x00, 0x02, 0x00, 0x00, 0xFF, };
+    unsigned char new_id = id + 1;
+    unsigned char version_probe[] = { 0xAA, new_id, 0x00, 0x02, 0x00, 0x00, 0xFF, };
     static char code[5] = { 0x00 };
     unsigned char data[1024];
     DWORD length;
@@ -467,7 +470,8 @@ reader_type_t ACIO::getReaderType( HANDLE hSerial, unsigned int id )
 
 void ACIO::getReaderState( HANDLE hSerial, unsigned int id, card_state_t *state, unsigned int *keypresses, unsigned char *cardId )
 {
-    unsigned char state_probe[] = { 0xAA, (id + 1), 0x01, 0x34, 0x00, 0x01, 0x10, 0xFF, };
+    unsigned char new_id = id + 1;
+    unsigned char state_probe[] = { 0xAA, new_id, 0x01, 0x34, 0x00, 0x01, 0x10, 0xFF, };
     unsigned char data[1024];
     DWORD length;
 
@@ -518,7 +522,8 @@ void ACIO::getReaderState( HANDLE hSerial, unsigned int id, card_state_t *state,
 
 void ACIO::setReaderState( HANDLE hSerial, unsigned int id, reader_state_t state )
 {
-    unsigned char state_request[] = { 0xAA, (id + 1), 0x01, 0x35, 0x00, 0x02, 0x10, 0xFF, 0xFF, };
+    unsigned char new_id = id + 1;
+    unsigned char state_request[] = { 0xAA, new_id, 0x01, 0x35, 0x00, 0x02, 0x10, 0xFF, 0xFF, };
     unsigned char data[1024];
     DWORD length;
 
@@ -553,7 +558,8 @@ void ACIO::setReaderState( HANDLE hSerial, unsigned int id, reader_state_t state
 
 void ACIO::requestCardId( HANDLE hSerial, unsigned int id )
 {
-    unsigned char id_request[] = { 0xAA, (id + 1), 0x01, 0x31, 0x00, 0x01, 0x10, 0xFF, };
+    unsigned char new_id = id + 1;
+    unsigned char id_request[] = { 0xAA, new_id, 0x01, 0x31, 0x00, 0x01, 0x10, 0xFF, };
     unsigned char data[1024];
     DWORD length;
 
